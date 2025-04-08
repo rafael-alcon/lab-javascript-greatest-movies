@@ -2037,17 +2037,88 @@ function dramaMoviesScore(moviesArray) {
 
 // Iteration 5: Ordering by year - Order by year, ascending (in growing order)
 function orderByYear(moviesArray) {
-    const peliculasnew = Array.from(moviesArray).sort((a,b)=>a.year-b.year)
-    return peliculasnew
+    
+    return Array.from(moviesArray).sort((a,b)=>a.year-b.year)
 }
 
 // Iteration 6: Alphabetic Order - Order by title and print the first 20 titles
-function orderAlphabetically(moviesArray) {}
+function orderAlphabetically(moviesArray) {
+    if (moviesArray.map(movie=>movie.title).sort().length>20){
+        return  moviesArray.map(movie=>movie.title).sort().slice(0,20)
+    }else{
+        return moviesArray.map(movie=>movie.title).sort()
+    }
+    
+}
 
 // BONUS - Iteration 7: Time Format - Turn duration of the movies from hours to minutes
-function turnHoursToMinutes(moviesArray) {}
+function turnHoursToMinutes(moviesArray) {
+  moviesArray = JSON.parse(JSON.stringify(moviesArray));
+  return moviesArray.map(movie => {
+    const duration = movie.duration.split(' ')
+      .reduce((duration, time) => {
+        if (time.includes('min')) {
+          time = time.replaceAll('min', '') // "22min" => "22"
+          duration += parseInt(time) 
+        } else {
+          time = time.replaceAll('h', '') // "2h" => "2"
+          duration += parseInt(time) * 60
+        }
+        return duration;
+      }, 0)
+    
+    movie.duration = duration;
+    return movie;
+  })
+
+}
 
 // BONUS - Iteration 8: Best yearly score average - Best yearly score average
-function bestYearAvg(moviesArray) {}
+function bestYearAvg(movies) {
+  if (movies.length === 0) {
+    return null;
+  }
 
-console.log(orderByYear(pelis))
+  const moviesByYear = movies.reduce((moviesByYear, movie) => {
+    if (moviesByYear[movie.year]) {
+      moviesByYear[movie.year].push(movie)
+    } else {
+      moviesByYear[movie.year] = [movie]
+    }
+    return moviesByYear;
+  }, {})
+
+  const best = Object.keys(moviesByYear)
+    .reduce((best, year) => {
+      const avg = scoresAverage(moviesByYear[year])
+      if (best.avg < avg) {
+        best = {
+          year: year,
+          avg: avg
+        }
+      }
+      return best;
+    }, { year: 0, avg: 0 });
+    
+  return `The best year was ${best.year} with an average score of ${best.avg}`;
+}
+
+
+
+// The following is required to make unit tests work.
+/* Environment setup. Do not modify the below code. */
+if (typeof module !== 'undefined') {
+  module.exports = {
+    getAllDirectors,
+    howManyMovies,
+    scoresAverage,
+    dramaMoviesScore,
+    orderByYear,
+    orderAlphabetically,
+    turnHoursToMinutes,
+    bestYearAvg,
+  };
+
+}
+
+console.log(turnHoursToMinutes(pelis))
